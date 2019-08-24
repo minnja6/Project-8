@@ -1,25 +1,32 @@
-doctype html
-head
-  title A Brief History of Time
-  link(rel='stylesheet', href='../public/stylesheets/style.css')
-h1 Update Book
-form
-  p
-    label(for='title') Title
-    input#title(name='title', type='text', value='A Brief History of Time')
-  p
-    label(for='author') Author
-    input#author(name='author', type='text', value='Stephen Hawking')
-  p
-    label(for='genre') Genre
-    input#genre(name='genre', type='text', value='Non-fiction')
-  p
-    label(for='year') Year
-    input#year(name='year', type='text', value='1988')
-  p
-    input(type='submit', value='Update Book')
-form(method='post', action='/books/8/delete', onsubmit="return confirm('Do you really want to delete this book?');")
-  p
-    a.button(href='all_books.html') Cancel
-  p
-    input(type='submit', value='Delete Book')
+extends layout
+
+block content
+  h1 Update Book
+  
+  form(method="post")
+    if errors && errors.length > 0
+      h2.error Oooops!
+        ul.error
+          each error in errors
+            li= error.message
+  
+    p  
+      label(for='title') Title:
+      input(type='text', name='title' value=book.title)
+    p
+      label(for='author') Author:
+      input(type='text', name='author' value=book.author)
+    p
+      label(for='genre') Genre:
+      input(type='text', name='genre' value=book.genre)
+    p
+      label(for='year') Year:
+      input(type='text', name='year' value=book.year)
+    p
+      input(type='submit', value ='Update Book')
+    p
+      a.button(href='/books') Cancel 
+
+  form(method='post', action = `/books/${book.id}/delete`, onsubmit="return confirm('Are you sure you want to delete this book?');")
+    p
+      input(type='submit', value ='Delete Book')

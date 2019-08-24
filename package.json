@@ -15,5 +15,18 @@
     "pug": "2.0.0-beta11",
     "sequelize": "^5.16.0",
     "sqlite3": "^4.1.0"
-  }
+  },
+  "description": "SQL Library Manager",
+  "main": "app.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/minnja6/Project-8.git"
+  },
+  "author": "Jasmine Minnieweather",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/minnja6/Project-8/issues"
+  },
+  "homepage": "https://github.com/minnja6/Project-8#readme"
 }
