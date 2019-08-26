@@ -11,7 +11,7 @@ const sequelize = new Sequelize({
 /* GET books listing. */
 router.get("/", async (req, res, next) => {
   try {
-    const booksPerPage = 5;
+    const booksPerPage = 10;
     const query = req.query.query ? req.query.query : "";
     const numPages = await Book.getNumPages(query, booksPerPage);
     const activePage = req.query.page ? parseInt(req.query.page): (numPages === 0 ? 0: 1);
@@ -68,7 +68,7 @@ router.get('/new', function(req, res, next) {
 
 /* POST create new Book */
 router.post('/new', function(req, res, next) {
-  Books.create(req.body).then(function(){
+  Book.create(req.body).then(function(){
     res.redirect('/');
   }).catch(function(err){
     if(err.name === "SequelizeValidationError") {
@@ -87,7 +87,7 @@ router.post('/new', function(req, res, next) {
 
 /* GET individual book */
 router.get('/:id', function(req, res, next) {
-  Books.findByPk(req.params.id).then(function(book){
+  Book.findByPk(req.params.id).then(function(book){
     if(book) {
       res.render('update-book', {book: book, title: book.title, id: req.params.id});
     } else {
