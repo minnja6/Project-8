@@ -4,6 +4,12 @@ block content
   h1= title
   p 
     a(href="/books/new") Create New Books
+
+  form(method='action', action='/books/search')
+    input(for='search' type='text', name='search', placeholder='Search..')
+    input(type='submit', value='Search', id="searchSubmit")
+
+
   table
     thead
         tr

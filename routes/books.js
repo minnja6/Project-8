@@ -1,11 +1,13 @@
 var express = require('express');
 var router = express.Router();
 var Books = require('../models').Book;
+var Sequlize = require('sequelize');
+var Op = Sequlize.Op;
 
 /* GET books listing. */
 router.get('/', function(req, res, next) {
   Books.findAll({order: [["createdAt", "DESC"]] }).then(function(books) {
-    res.render('index', {books: books, title: 'Books'});
+    res.render('index', {books: books, title: "Jasmine's Book Library"});
   }).catch(function(err) {
     res.send(500);
   });
@@ -90,6 +92,28 @@ router.post('/:id/delete', function(req, res, next) {
     res.send(500);
   });;
 });
+router.get('/search', (req, res) => {
+  const { term } = req.query;
+  // term = term.toLowerCase();
+  Books.findAll({where: {[Op.or]: [
+      {
+          title: {[Op.like] : '%' + term + '%'}
+      },
+      {
+          author: {[Op.like] : '%' + term + '%'}
+      },
+      {
+          genre: {[Op.like] : '%' + term + '%'}
+      },
+      {
+          year: {[Op.like] : '%' + term + '%'}
+      }
+  ]}})
+      .then(books => {
+          res.render('search-results', {books, term});
+      })
+      .catch(err => console.log(err));
+});
 
 
 
@@ -97,23 +121,71 @@ module.exports = router;
 // const express = require('express');
 // const router = express.Router();
 // const Book = require("../models").Book;
+// const Sequelize = require('sequelize');
+// const Op = Sequelize.Op;
+// const sequelize = new Sequelize({
+//   dialect: 'sqlite',
+//   storage: 'library.db'
+// });
 
 // /* GET books listing. */
-// router.get('/', function(req, res, next) {
-//   Book.findAll({order: [["title", "ASC"]]}).then(function(books){
-//     // console.log("Start: Render index of books");
-//     res.render("index", { books, title: "Jasmine's SQL Library" });
-//     // console.log("End: Render index of books");
-//   }).catch(function(err){
-//     err.statusCode = err.statusCode || 500;
-//     throw err;
-//     // res.send(500);
-//   });
+// router.get("/", async (req, res, next) => {
+//   try {
+//     const booksPerPage = 5;
+//     const query = req.query.query ? req.query.query : "";
+//     const numPages = await Book.getNumPages(query, booksPerPage);
+//     const activePage = req.query.page ? parseInt(req.query.page): (numPages === 0 ? 0: 1);
+//     if (activePage > numPages || activePage < 0) {
+//       return next();
+//     }
+//     const books = await Book.findByQueryAndPagination(
+//       query,
+//       booksPerPage,
+//       activePage
+//     );
+//     res.locals.books = books;
+//     res.locals.title = "Maliha's Awesome Library";
+//     res.locals.pages = numPages;
+//     res.locals.query = query;
+//     res.locals.activePage = activePage;
+//     res.render("index");
+//   } catch (err) {
+//     return next(err);
+//   }
 // });
+
+
+// /* GET search book. */
+// router.get('/search', (req, res) => {
+//   const query = req.query.search.toLowerCase();
+
+//   Book.findAll({
+//       where: {
+//           [Op.or]: [
+//               sequelize.where(
+//                   sequelize.fn('lower', sequelize.col('title')),
+//                   { [Op.like]: '%' + query + '%' },
+//               ),
+//               sequelize.where(
+//                   sequelize.fn('lower', sequelize.col('author')),
+//                   { [Op.like]: '%' + query + '%' },
+//               ),
+//               sequelize.where(
+//                   sequelize.fn('lower', sequelize.col('genre')),
+//                   { [Op.like]: '%' + query + '%' },
+//               ),
+//               sequelize.where(
+//                   sequelize.fn('lower', sequelize.col('year')),
+//                   { [Op.like]: '%' + query + '%' },
+//               )
+//           ]
+//       }
+//   }).then(books => res.render('index', { books }));
+// });
+
 
 // /* POST create book. */
 // router.post('/new', function(req, res, next) {
-//   // let {title, author, genre, year} = req.body;
 //   Book.create(req.body).then(function(book){
 //     res.redirect("/books/" + book.id);
 //   }).catch(function(err){
@@ -131,8 +203,7 @@ module.exports = router;
 //   });
 // });
 
-// /* Create a new book form. */
-// router.get('/new', function(req, res, next) {
+// router.get('/new', function(req, res) {
 //   res.render("new", {book: Book.build(), title: "New Book"});
 // });
 
@@ -159,7 +230,7 @@ module.exports = router;
 //       res.send(404);
 //     }
 //   }).catch(function(err){
-//     // res.send(500);
+//     res.send(500);
 //   });
 // });
 
@@ -171,10 +242,11 @@ module.exports = router;
 //       res.render('show', { book, title: book.title });
 //     } else {
 //       res.send(404);
+//       console.log('This id does not exist. Please try again.');
 //     }
 //   }).catch(function(err){
-//     // res.send(500);
-//     res.render('page-not-found')
+//     res.send(500);
+//     res.render('page-not-found');
 //   });
 // });
 
@@ -222,120 +294,5 @@ module.exports = router;
 //     res.send(500);
 //   });
 // });
+
 // module.exports = router;
-
-
-// // var express = require('express');
-// // var router = express.Router();
-// // var Book = require("../models").Book;
-
-// // /* GET articles listing. */
-// // router.get('/', function(req, res, next) {
-// //   Book.findAll({order: [["createdAt", "DESC"]]}).then(function(books){
-// //     res.render("books/index", {books: books, title: "My Awesome Blog" });
-// //   }).catch(function(error){
-// //       res.send(500, error);
-// //    });
-// // });
-
-// // /* POST create article. */
-// // router.post('/', function(req, res, next) {
-// //   Book.create(req.body).then(function(book) {
-// //     res.redirect("/books/" + book.id);
-// //   }).catch(function(error){
-// //       if(error.name === "SequelizeValidationError") {
-// //         res.render("books/new", {book: Book.build(req.body), errors: error.errors, title: "New Book"})
-// //       } else {
-// //         throw error;
-// //       }
-// //   }).catch(function(error){
-// //       res.send(500, error);
-// //    });
-// // ;});
-
-// // /* Create a new article form. */
-// // router.get('/new', function(req, res, next) {
-// //   res.render("books/new", {book: {}, title: "New Book"});
-// // });
-
-// // /* Edit article form. */
-// // router.get("/:id/edit", function(req, res, next){
-// //   Book.findById(req.params.id).then(function(book){
-// //     if(article) {
-// //       res.render("books/edit", {book: book, title: "Edit Book"});      
-// //     } else {
-// //       res.send(404);
-// //     }
-// //   }).catch(function(error){
-// //       res.send(500, error);
-// //    });
-// // });
-
-
-// // /* Delete article form. */
-// // router.get("/:id/delete", function(req, res, next){
-// //   Book.findById(req.params.id).then(function(book){  
-// //     if(book) {
-// //       res.render("books/delete", {book: book, title: "Delete Book"});
-// //     } else {
-// //       res.send(404);
-// //     }
-// //   }).catch(function(error){
-// //       res.send(500, error);
-// //    });
-// // });
-
-
-// // /* GET individual article. */
-// // router.get("/:id", function(req, res, next){
-// //   Book.findById(req.params.id).then(function(article){
-// //     if(book) {
-// //       res.render("books/show", {article: book, title: book.title});  
-// //     } else {
-// //       res.send(404);
-// //     }
-// //   }).catch(function(error){
-// //       res.send(500, error);
-// //    });
-// // });
-
-// // /* PUT update article. */
-// // router.put("/:id", function(req, res, next){
-// //   Book.findById(req.params.id).then(function(book){
-// //     if(book) {
-// //       return book.update(req.body);
-// //     } else {
-// //       res.send(404);
-// //     }
-// //   }).then(function(book){
-// //     res.redirect("/books/" + book.id);        
-// //   }).catch(function(error){
-// //       if(error.name === "SequelizeValidationError") {
-// //         var book = Book.build(req.body);
-// //         book.id = req.params.id;
-// //         res.render("books/edit", {book: book, errors: error.errors, title: "Edit Book"})
-// //       } else {
-// //         throw error;
-// //       }
-// //   }).catch(function(error){
-// //       res.send(500, error);
-// //    });
-// // });
-
-// // /* DELETE individual article. */
-// // router.delete("/:id", function(req, res, next){
-// //   Book.findById(req.params.id).then(function(book){  
-// //     if(book) {
-// //       return book.destroy();
-// //     } else {
-// //       res.send(404);
-// //     }
-// //   }).then(function(){
-// //     res.redirect("/books");    
-// //   }).catch(function(error){
-// //       res.send(500, error);
-// //    });
-// // });
-
-
-// // module.exports = router
