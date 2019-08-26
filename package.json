@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "npx nodemon --inspect ./bin/www"
   },
   "dependencies": {
     "cookie-parser": "^1.4.4",
@@ -11,14 +11,15 @@
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
     "morgan": "^1.9.1",
-    "nodemon": "^1.19.1",
     "pug": "2.0.0-beta11",
     "sequelize": "^5.16.0",
     "sqlite3": "^4.1.0"
   },
   "description": "SQL Library Manager",
   "main": "app.js",
-  "devDependencies": {},
+  "devDependencies": {
+    "nodemon": "^1.19.1"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/minnja6/Project-8.git"

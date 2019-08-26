@@ -7,8 +7,8 @@ block content
 
   form(method='action', action='/books/search')
     input(for='search' type='text', name='search', placeholder='Search..')
-    input(type='submit', value='Search', id="searchSubmit")
-
+    input(type='submit', value='Search', id="searchSubmit")  
+    a.button(href="/books") Go Home
 
   table
     thead
@@ -25,3 +25,10 @@ block content
                 td= book.author
                 td= book.genre
                 td= book.year
+
+  br
+  div.pagination
+    - let page=1;
+    while page <= pages
+      a.button(href=`/books?query=${query?query:""}&page=${page}` class=`${activePage===page ? "active" : ""}`)= page
+      - page += 1;
