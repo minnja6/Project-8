@@ -1,7 +1,7 @@
 'use strict';
 const Sequelize = require("sequelize");
 
-/* Book model definition and model methods. */
+//Book model format and validation
 
 module.exports = (sequelize, DataTypes) => {
   const Book = sequelize.define('Book', {
@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
   };
 
  
-/* Returns the number of pages required based on the query and records per page. */
+//Gets and returns the number of pages required based on the query and records per page
   Book.getNumPages = async function(query, perPage) {
     try {
       const Op = Sequelize.Op;
@@ -51,7 +51,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
 
-/* Returns all records based on query, the current page, and books per page. */
+//Finds and returns all results based on the search, book listings per page, and the amount of pages 
   Book.findByQueryAndPagination = async function(
     query,
     booksPerPage,
