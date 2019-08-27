@@ -61,29 +61,57 @@ router.get('/search', (req, res) => {
   }).then(books => res.render('index', { books }));
 });
 
-/* GET create new Book */
-router.get('/new', function(req, res, next) {
-  res.render('new-book', {book: Books.build() });
+//GET /books/new - Display the create new book form
+router.get('/new', (req, res) =>
+    res.render('new-book', { book: Book.build(), pageTitle: "New Book" })
+);
+
+//POST /books/new - Posts a new book to the database
+router.post('/new', (req, res, next) => {
+    Book.create(req.body).then(function (book) {
+        let { title, author, genre, year } = req.body;
+        res.redirect('/')       // after creating book, goes back to home page
+    })
+        .catch(err => {
+            if (err.name === "SequelizeValidationError") {
+                // console.log('Sequelize Validation Error thrown');
+                res.render('new-book', {
+                    book: Book.build(req.body),
+                    pageTitle: "New Book",
+                    errors: err.errors
+                })
+            } else {
+                throw error;
+            }
+        }).catch(function (error) {
+            // res.send(500, error);
+        });
 });
 
-/* POST create new Book */
-router.post('/new', function(req, res, next) {
-  Book.create(req.body).then(function(){
-    res.redirect('/');
-  }).catch(function(err){
-    if(err.name === "SequelizeValidationError") {
-      res.render('new-book', {
-        book: Books.build(req.body),
-        title: "New title",
-        errors: err.errors
-      });
-    } else {
-      throw err;
-    }
-  }).catch(function(err) {
-    res.send(500);
-  });;
-});
+/* GET create new Book */
+// router.get('/new', function(req, res, next) {
+//   res.render('new-book', {book: Book.build() });
+// });
+
+// /* POST create new Book */
+// router.post('/new', function(req, res, next) {
+//   Book.create(req.body).then(function(){
+//     res.redirect('/');
+//   }).catch(function(err){
+//     if(err.name === "SequelizeValidationError") {
+//       res.render('new-book', {
+//         book: Books.build(req.body),
+//         title: "New title",
+//         errors: err.errors
+//       });
+//     } else {
+//       throw err;
+//     }
+//   })
+//   .catch(function(err) {
+//     res.send(500);
+//   });;
+// });
 
 /* GET individual book */
 router.get('/:id', function(req, res, next) {
@@ -100,7 +128,7 @@ router.get('/:id', function(req, res, next) {
 
 /* POST update individual book */
 router.post('/:id', function(req, res, next) {
-  Books.findByPk(req.params.id).then(function(book){
+  Book.findByPk(req.params.id).then(function(book){
     if(book) {
       return book.update(req.body);
     } else {
@@ -110,7 +138,7 @@ router.post('/:id', function(req, res, next) {
     res.redirect('/');
   }).catch(function(err){
     if(err.name === "SequelizeValidationError") {
-      var book = Books.build(req.body);
+      var book = Book.build(req.body);
       book.id = req.params.id;
 
       res.render('update-book', {
@@ -128,7 +156,7 @@ router.post('/:id', function(req, res, next) {
 
 /* POST delete individual book */
 router.post('/:id/delete', function(req, res, next) {
-  Books.findByPk(req.params.id).then(function(book){
+  Book.findByPk(req.params.id).then(function(book){
     if(book) {
       return book.destroy();
     } else {

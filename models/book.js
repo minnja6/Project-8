@@ -1,16 +1,35 @@
 'use strict';
 const Sequelize = require("sequelize");
+
+/* Book model definition and model methods. */
+
 module.exports = (sequelize, DataTypes) => {
   const Book = sequelize.define('Book', {
-    title: DataTypes.STRING,
-    author: DataTypes.STRING,
+    title: {
+      type: DataTypes.STRING,
+      validate: {
+        notEmpty: {
+          msg: "Title is required"
+        }
+      }
+    },
+    author: {
+      type: DataTypes.STRING,
+      validate: {
+        notEmpty: {
+          msg: "Author is required"
+        }
+      }
+    },
     genre: DataTypes.STRING,
     year: DataTypes.INTEGER
   }, {});
   Book.associate = function(models) {
     // associations can be defined here
   };
-  /* Returns the number of pages required based on the query and records per page. */
+
+ 
+/* Returns the number of pages required based on the query and records per page. */
   Book.getNumPages = async function(query, perPage) {
     try {
       const Op = Sequelize.Op;
@@ -60,4 +79,3 @@ module.exports = (sequelize, DataTypes) => {
 
   return Book;
 };
-
